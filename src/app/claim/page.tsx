@@ -5,9 +5,7 @@ import styles from './claim.module.css';
 import Toast from '@/components/Toast';
 
 export default function ClaimPage() {
-  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({ fullName: '', email: '', phone: '' });
-  const [otp, setOtp] = useState('');
   const [voucher, setVoucher] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -20,7 +18,7 @@ export default function ClaimPage() {
     return /^09\d{9}$/.test(phone);
   };
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validatePhone(formData.phone)) {
@@ -30,65 +28,6 @@ export default function ClaimPage() {
 
     setLoading(true);
 
-    try {
-      const res = await fetch('/api/otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: formData.phone })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        showToast(data.error || 'Failed to send OTP', 'error');
-        setLoading(false);
-        return;
-      }
-
-      showToast('OTP sent to your phone! Check console for testing.', 'success');
-      console.log('TEST OTP:', data.otp);
-      setStep(2);
-    } catch (error) {
-      showToast('Server error. Please try again.', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (otp.length !== 6) {
-      showToast('Please enter a 6-digit OTP', 'error');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const res = await fetch('/api/otp', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: formData.phone, otp })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        showToast(data.error || 'Invalid OTP', 'error');
-        setLoading(false);
-        return;
-      }
-
-      showToast('Phone verified! Claiming voucher...', 'success');
-      await claimVoucher();
-    } catch (error) {
-      showToast('Server error. Please try again.', 'error');
-      setLoading(false);
-    }
-  };
-
-  const claimVoucher = async () => {
     try {
       const res = await fetch('/api/voucher/claim', {
         method: 'POST',
@@ -106,7 +45,6 @@ export default function ClaimPage() {
       const data = await res.json();
       setVoucher(data.code);
       showToast('Voucher claimed successfully!', 'success');
-      setStep(3);
     } catch (error) {
       showToast('Server error. Please try again.', 'error');
     } finally {
@@ -119,7 +57,7 @@ export default function ClaimPage() {
     showToast('Voucher code copied to clipboard!', 'success');
   };
 
-  if (step === 3) {
+  if (voucher) {
     return (
       <div className={styles.page}>
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -133,42 +71,10 @@ export default function ClaimPage() {
     );
   }
 
-  if (step === 2) {
-    return (
-      <div className={styles.page}>
-        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-        <form className={styles.card} onSubmit={handleVerifyOTP}>
-          <h1>Verify Your Phone</h1>
-          <p className={styles.otpInfo}>Enter the 6-digit code sent to {formData.phone}</p>
-          <input
-            type="text"
-            placeholder="Enter 6-digit OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            required
-            className={styles.input}
-            maxLength={6}
-          />
-          <button type="submit" disabled={loading} className={styles.btn}>
-            {loading ? 'Verifying...' : 'Verify OTP'}
-          </button>
-          <button 
-            type="button" 
-            onClick={() => setStep(1)} 
-            className={styles.btnSecondary}
-            disabled={loading}
-          >
-            Back
-          </button>
-        </form>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.page}>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      <form className={styles.card} onSubmit={handleSendOTP}>
+      <form className={styles.card} onSubmit={handleSubmit}>
         <h1>Claim Your Voucher</h1>
         <input
           type="text"
@@ -199,7 +105,7 @@ export default function ClaimPage() {
           <p className={styles.error}>Phone must start with 09 and have 11 digits</p>
         )}
         <button type="submit" disabled={loading} className={styles.btn}>
-          {loading ? 'Sending OTP...' : 'Send OTP'}
+          {loading ? 'Processing...' : 'Claim Voucher'}
         </button>
       </form>
     </div>
