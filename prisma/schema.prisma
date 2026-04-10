@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  phone     String
+  createdAt DateTime @default(now())
+  voucher   Voucher?
+}
+
+model Voucher {
+  id         String    @id @default(cuid())
+  code       String    @unique
+  customerId String    @unique
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  status     String    @default("ACTIVE")
+  usedAt     DateTime?
+  branchId   String?
+  branch     Branch?   @relation(fields: [branchId], references: [id])
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+}
+
+model Branch {
+  id       String    @id @default(cuid())
+  name     String
+  location String?
+  vouchers Voucher[]
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+}

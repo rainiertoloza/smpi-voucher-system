@@ -1,0 +1,241 @@
+# Voucher Generator & Tracking System
+
+A full-stack voucher system where customers scan a QR code, land on a form page, submit personal details, and receive an auto-generated voucher code. An admin dashboard tracks redemptions, branch usage, and conversion analytics — hidden from directory brute-force tools like `dirb`.
+
+---
+
+## Recommended Tech Stack
+
+| Layer | Technology | Rationale |
+|---|---|---|
+| **Framework** | Next.js 14 (App Router) | Full-stack React, API routes, SSR, great DX |
+| **Language** | TypeScript | Type safety, better maintainability |
+| **Database** | SQLite via Prisma ORM | Zero-config, file-based, perfect for single-server deployments. Can migrate to PostgreSQL later |
+| **QR Code** | `qrcode` npm package | Generate QR codes pointing to the landing page |
+| **Voucher Codes** | `nanoid` | Cryptographically secure, short unique IDs |
+| **Charts** | `recharts` | Simple, composable React chart library |
+| **Styling** | Vanilla CSS with CSS Modules | No external CSS framework, full control |
+| **Auth (Admin)** | Cookie-based session with bcrypt | Simple, no external auth provider needed |
+
+> [!TIP]
+> **Why SQLite?** For a voucher system without massive concurrent writes, SQLite is ideal — zero setup, single-file database, easy backups. If you later need PostgreSQL or MySQL, Prisma makes migration trivial (just change the `provider` in `schema.prisma`).
+
+---
+
+## User Review Required
+
+### 1. Admin Dashboard Security Strategy
+
+> [!IMPORTANT]
+> **Hiding the admin from `dirb`:**  
+> `dirb` works by brute-forcing common directory names like `/admin`, `/dashboard`, `/panel`, etc. Our strategy uses **multiple layers**:
+>
+> 1. **Random route path** — The admin lives at `/gate/<random-hash>` (e.g., `/gate/x7k9m2p4`) instead of predictable names. This path is NOT in any standard wordlist.
+> 2. **No client-side links** — Zero `<a>` tags or navigation pointing to the admin. It's completely detached from the public-facing app.
+> 3. **Login-gated rendering** — Even if someone stumbles on the URL, they see a generic login form with no branding hinting it's an admin panel.
+> 4. **Rate limiting** — API routes that power admin features are rate-limited.
+> 5. **Custom response headers** — No `X-Powered-By` or framework leaks.
+>
+> **Do you want me to use a specific secret path, or should I generate a random one?**
+
+### 2. Branch Configuration
+
+> [!IMPORTANT]
+> The system tracks which branch a voucher was redeemed at. I'll seed the database with some sample branches. **Please provide your branch names**, or I'll use placeholder names like "Main Branch", "Downtown Branch", "Mall Branch".
+
+### 3. Voucher Code Format
+
+> [!NOTE]
+> Default voucher format: `VCH-XXXXXX` (6 alphanumeric characters, ~2 billion combinations). Want a different prefix or length?
+
+---
+
+## Proposed Changes
+
+### Project Initialization
+
+#### [NEW] Next.js project scaffolded with TypeScript
+- `npx create-next-app@latest ./ --typescript --app --src-dir --no-tailwind`
+- Install dependencies: `prisma`, `@prisma/client`, `qrcode`, `nanoid`, `recharts`, `bcryptjs`
+
+---
+
+### Database Layer (Prisma + SQLite)
+
+#### [NEW] `prisma/schema.prisma`
+Data models:
+
+```prisma
+model Customer {
+  id          String    @id @default(cuid())
+  fullName    String
+  email       String
+  phone       String
+  createdAt   DateTime  @default(now())
+  voucher     Voucher?
+}
+
+model Voucher {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  customerId  String    @unique
+  customer    Customer  @relation(fields: [customerId], references: [id])
+  status      String    @default("ACTIVE")   // ACTIVE | USED | EXPIRED
+  usedAt      DateTime?
+  branchId    String?
+  branch      Branch?   @relation(fields: [branchId], references: [id])
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+}
+
+model Branch {
+  id          String    @id @default(cuid())
+  name        String
+  location    String?
+  vouchers    Voucher[]
+}
+
+model Admin {
+  id          String    @id @default(cuid())
+  username    String    @unique
+  password    String                          // bcrypt hashed
+}
+```
+
+#### [NEW] `prisma/seed.ts`
+Seeds branches and an initial admin account.
+
+---
+
+### Public Landing Page (Customer-Facing)
+
+#### [NEW] `src/app/page.tsx`
+- Hero section with branding
+- Redirects to the claim form
+
+#### [NEW] `src/app/claim/page.tsx`
+Multi-step form:
+1. **Step 1**: Personal details (name, email, phone)
+2. **Step 2**: Form submission → API generates voucher
+3. **Step 3**: Success screen showing the voucher code with copy-to-clipboard
+
+#### [NEW] `src/app/api/voucher/claim/route.ts`
+- Validates input (email format, phone, name)
+- Checks for duplicate email (one voucher per email)
+- Generates unique voucher code using `nanoid`
+- Stores customer + voucher in database
+- Returns voucher code
+
+---
+
+### Hidden Admin Dashboard
+
+#### [NEW] `src/app/gate/[secretPath]/page.tsx`
+- Login page (no admin branding)
+- Validates against hashed admin credentials
+- Sets an HTTP-only secure cookie session
+
+#### [NEW] `src/app/gate/[secretPath]/dashboard/page.tsx`
+Main admin dashboard with:
+- **Overview Cards**: Total vouchers issued, total redeemed, conversion rate, active vouchers
+- **Charts**: Redemptions over time (line chart), redemptions by branch (bar chart)
+- **Voucher Table**: Searchable, sortable list with status, customer, branch, timestamps
+- **Voucher Redemption**: Input field to enter a voucher code + select branch → marks as used
+
+#### [NEW] `src/app/gate/[secretPath]/dashboard/layout.tsx`
+- Admin layout with sidebar navigation
+- Session validation middleware (redirect to login if not authenticated)
+
+#### [NEW] API Routes for Admin:
+- `src/app/api/admin/login/route.ts` — Authenticate admin
+- `src/app/api/admin/vouchers/route.ts` — List/search vouchers with pagination
+- `src/app/api/admin/vouchers/redeem/route.ts` — Redeem a voucher (set status, branch, timestamp)
+- `src/app/api/admin/analytics/route.ts` — Aggregated analytics data
+- `src/app/api/admin/logout/route.ts` — Clear session
+
+> [!WARNING]
+> All admin API routes validate the session cookie before processing. Unauthenticated requests get a generic `404` (not `401`) to avoid revealing the existence of admin endpoints.
+
+---
+
+### QR Code Generation Utility
+
+#### [NEW] `src/lib/qr-generator.ts`
+- Utility to generate a QR code image (PNG/SVG) pointing to the landing page URL
+- Admin can download the QR code from the dashboard
+
+---
+
+### Security & Middleware
+
+#### [NEW] `src/middleware.ts`
+- Strips `X-Powered-By` header
+- Admin route protection (session cookie check)
+- Rate limiting on API routes
+
+#### [NEW] `next.config.js` modifications
+- Disable `X-Powered-By` header
+- Security headers (CSP, HSTS, etc.)
+
+---
+
+### Styling & Design System
+
+#### [NEW] `src/app/globals.css`
+- CSS custom properties design system (colors, typography, spacing)
+- Dark mode support
+- Glassmorphism effects for cards
+- Smooth animations and micro-interactions
+
+#### [NEW] CSS Modules per component
+- Modern, premium aesthetic
+- Mobile-first responsive design
+- Animated voucher reveal on the success screen
+
+---
+
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    QR["📱 QR Code Scan"] --> LP["🌐 Landing Page"]
+    LP --> CF["📝 Claim Form\n(Name, Email, Phone)"]
+    CF --> API1["⚡ POST /api/voucher/claim"]
+    API1 --> DB[(🗄️ SQLite Database)]
+    API1 --> VC["🎫 Voucher Code Generated"]
+    VC --> CS["✅ Success Screen\n(Copy Voucher Code)"]
+
+    ADMIN["🔐 Admin Login\n(/gate/secret-hash)"] --> DASH["📊 Dashboard"]
+    DASH --> ANAL["📈 Analytics\n(Charts, Stats)"]
+    DASH --> REDEEM["🔍 Redeem Voucher\n(Code + Branch)"]
+    REDEEM --> API2["⚡ POST /api/admin/vouchers/redeem"]
+    API2 --> DB
+    ANAL --> API3["⚡ GET /api/admin/analytics"]
+    API3 --> DB
+```
+
+---
+
+## Open Questions
+
+1. **Secret admin path** — Should I generate a random one, or do you have a preferred secret URL segment?
+2. **Branch names** — What branches should be seeded? Or use placeholders?
+3. **Voucher expiration** — Should vouchers expire after a set time (e.g., 30 days), or no expiration?
+4. **QR Code target URL** — What is the domain/URL the QR code should point to? (I can use `localhost:3000` for development)
+5. **Email notifications** — Should the system send the voucher code via email, or only display it on-screen?
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- `npx prisma db push` — Verify schema works
+- `npm run build` — Ensure no TypeScript/build errors
+- Browser testing of the full user flow (claim form → voucher generation → admin redemption)
+
+### Manual Verification
+- Scan generated QR code with phone
+- Complete the claim flow end-to-end
+- Login to admin dashboard, verify analytics render
+- Redeem a voucher and confirm status updates
+- Run `dirb http://localhost:3000` to verify admin routes are NOT discoverable

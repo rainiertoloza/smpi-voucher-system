@@ -1,0 +1,13 @@
+# Icons Folder
+
+Place your icon files here.
+
+Suggested files:
+- `favicon.ico` - Browser tab icon (16x16, 32x32, 48x48)
+- `logo.png` - Main logo (transparent background recommended)
+- `logo-white.png` - White version for dark backgrounds
+- `apple-touch-icon.png` - iOS home screen icon (180x180)
+- `android-chrome-192x192.png` - Android icon
+- `android-chrome-512x512.png` - Android icon (larger)
+
+You can generate favicons from a single image using: https://realfavicongenerator.net/

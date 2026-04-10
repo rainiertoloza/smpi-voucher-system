@@ -1,0 +1,38 @@
+# Voucher System — Task Tracker
+
+## Project Setup
+- [ ] Initialize Next.js project with TypeScript
+- [ ] Install dependencies (prisma, qrcode, nanoid, recharts, bcryptjs, nodemailer)
+- [ ] Configure next.config.js (security headers, disable x-powered-by)
+
+## Database Layer
+- [ ] Create Prisma schema (Customer, Voucher, Branch, Admin)
+- [ ] Create seed file (37 branches, admin account)
+- [ ] Run migrations
+
+## Public Landing Page
+- [ ] Create globals.css design system
+- [ ] Build landing page (hero + CTA)
+- [ ] Build multi-step claim form
+- [ ] Create voucher claim API route
+- [ ] Build success screen with voucher display + copy
+- [ ] Email sending utility (nodemailer)
+
+## Hidden Admin Dashboard (route: /gate/v9x3k7m2q8)
+- [ ] Admin login page
+- [ ] Admin login API route
+- [ ] Admin dashboard layout + sidebar
+- [ ] Overview cards (total issued, redeemed, conversion rate, active)
+- [ ] Analytics charts (recharts)
+- [ ] Voucher table (searchable, sortable)
+- [ ] Voucher redemption (code input + branch select)
+- [ ] Admin API routes (vouchers, redeem, analytics, logout)
+- [ ] QR code download utility
+
+## Security & Middleware
+- [ ] Middleware (session check, header stripping, rate limiting)
+- [ ] Admin routes return 404 for unauthenticated
+
+## Verification
+- [ ] Build succeeds
+- [ ] Full flow test in browser
