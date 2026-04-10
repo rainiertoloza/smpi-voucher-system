@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import styles from './dashboard.module.css';
 import Toast from '@/components/Toast';
 
-const COLORS = ['#10b981', '#fdd802'];
+const COLORS = ['#0058a9', '#fdd802'];
 
 export default function Dashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
