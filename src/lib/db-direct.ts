@@ -190,5 +190,30 @@ export const dbDirect = {
       deleted: vouchersToDelete.rows.length, 
       message: `Deleted ${vouchersToDelete.rows.length} vouchers older than ${monthsAgo} months` 
     };
+  },
+
+  async deleteVoucher(voucherId: string) {
+    const db = getDatabase();
+    
+    const voucher = await db.execute({
+      sql: 'SELECT customerId FROM Voucher WHERE id = ?',
+      args: [voucherId]
+    });
+    
+    if (voucher.rows.length === 0) throw new Error('Voucher not found');
+    
+    const customerId = (voucher.rows[0] as any).customerId;
+    
+    await db.execute({
+      sql: 'DELETE FROM Voucher WHERE id = ?',
+      args: [voucherId]
+    });
+    
+    await db.execute({
+      sql: 'DELETE FROM Customer WHERE id = ?',
+      args: [customerId]
+    });
+    
+    await db.execute('UPDATE VoucherLimit SET currentCount = currentCount - 1 WHERE id = 1');
   }
 };

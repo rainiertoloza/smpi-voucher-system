@@ -43,6 +43,26 @@ export default function DatabaseViewer() {
     }
   };
 
+  const handleDelete = async (voucherId: string, voucherCode: string) => {
+    if (!confirm(`Delete voucher ${voucherCode}? This cannot be undone!`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/vouchers/delete?id=${voucherId}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        alert('Voucher deleted successfully!');
+        loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete voucher');
+      }
+    } catch (error) {
+      alert('Server error. Please try again.');
+    }
+  };
+
   if (!data) return <div className={styles.loading}>Loading...</div>;
 
   return (
@@ -100,6 +120,7 @@ export default function DatabaseViewer() {
                     <th>Created At</th>
                     <th>Used At</th>
                     <th>Expires At</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -113,6 +134,15 @@ export default function DatabaseViewer() {
                       <td>{new Date(v.createdAt).toLocaleString()}</td>
                       <td>{v.usedAt ? new Date(v.usedAt).toLocaleString() : '-'}</td>
                       <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleString() : '-'}</td>
+                      <td>
+                        <button 
+                          onClick={() => handleDelete(v.id, v.code)}
+                          className={styles.deleteBtn}
+                          title="Delete voucher"
+                        >
+                          🗑️
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
