@@ -265,13 +265,162 @@
   .header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .backBtn {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
   }
 
   .tabs {
-    overflow-x: scroll;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab,
+  .tabActive {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .tableCard {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .tableCard h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .tableWrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .code {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  .deleteBtn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
   }
 
   .settingsGrid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .settingCard {
+    padding: 1rem;
+  }
+
+  .bigNumber {
+    font-size: 2rem;
+  }
+
+  .path {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    word-break: break-all;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 0.75rem;
+  }
+
+  .header h1 {
+    font-size: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .backBtn {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .tab,
+  .tabActive {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.85rem;
+  }
+
+  .tableCard {
+    padding: 0.75rem;
+  }
+
+  .tableCard h2 {
+    font-size: 1rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.5rem 0.35rem;
+    font-size: 0.65rem;
+  }
+
+  .code {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .deleteBtn {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .bigNumber {
+    font-size: 1.75rem;
+  }
+
+  .settingCard h3 {
+    font-size: 0.8rem;
+  }
+
+  .path {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.6rem;
   }
 }
