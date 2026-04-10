@@ -239,13 +239,6 @@ export default function DatabaseViewer() {
                   <span className={styles.label}>Available Slots</span>
                 </div>
               </div>
-              <div className={styles.settingCard}>
-                <h3>Database File</h3>
-                <div className={styles.settingValue}>
-                  <code className={styles.path}>./dev.db</code>
-                  <span className={styles.label}>SQLite Database</span>
-                </div>
-              </div>
             </div>
           </div>
         )}
