@@ -10,6 +10,7 @@
   padding: 1rem;
   position: relative;
   -webkit-overflow-scrolling: touch;
+  will-change: transform;
 }
 
 .page::before {
@@ -21,6 +22,7 @@
   bottom: 0;
   background: linear-gradient(135deg, rgba(0, 88, 169, 0.85) 0%, rgba(0, 112, 217, 0.75) 100%);
   z-index: 1;
+  will-change: opacity;
 }
 
 .card {
@@ -36,6 +38,8 @@
   position: relative;
   z-index: 2;
   animation: fadeInUp 0.6s ease-out;
+  will-change: transform, opacity;
+  contain: layout style paint;
 }
 
 @keyframes fadeInUp {
