@@ -3,10 +3,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './database.module.css';
+import Toast from '@/components/Toast';
 
 export default function DatabaseViewer() {
   const [activeTab, setActiveTab] = useState('vouchers');
   const [data, setData] = useState<any>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
 
   useEffect(() => {
     loadData();
@@ -39,7 +45,7 @@ export default function DatabaseViewer() {
       setData({ vouchers, analytics, branches, limit });
     } catch (error) {
       console.error('Database load error:', error);
-      alert('Failed to load database. Please try again.');
+      showToast('Failed to load database. Please try again.', 'error');
     }
   };
 
@@ -52,14 +58,14 @@ export default function DatabaseViewer() {
       });
 
       if (res.ok) {
-        alert('Voucher deleted successfully!');
+        showToast('Voucher deleted successfully!', 'success');
         loadData();
       } else {
         const data = await res.json();
-        alert(data.error || 'Failed to delete voucher');
+        showToast(data.error || 'Failed to delete voucher', 'error');
       }
     } catch (error) {
-      alert('Server error. Please try again.');
+      showToast('Server error. Please try again.', 'error');
     }
   };
 
@@ -67,6 +73,7 @@ export default function DatabaseViewer() {
 
   return (
     <div className={styles.page}>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <div className={styles.header}>
         <div>
           <h1>Database Viewer</h1>

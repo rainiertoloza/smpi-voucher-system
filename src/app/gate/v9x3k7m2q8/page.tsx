@@ -1,17 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import Toast from '@/components/Toast';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('Logging in...');
 
     try {
       const res = await fetch('/api/admin/login', {
@@ -23,14 +27,16 @@ export default function AdminLogin() {
       const data = await res.json();
       
       if (res.ok) {
-        setMessage('Success! Redirecting...');
-        window.location.href = '/gate/v9x3k7m2q8/dashboard';
+        showToast('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = '/gate/v9x3k7m2q8/dashboard';
+        }, 1000);
       } else {
-        setMessage('Error: ' + (data.error || 'Login failed'));
+        showToast(data.error || 'Login failed', 'error');
         setLoading(false);
       }
     } catch (error: any) {
-      setMessage('Error: ' + error.message);
+      showToast('Server error. Please try again.', 'error');
       setLoading(false);
     }
   };
@@ -44,6 +50,7 @@ export default function AdminLogin() {
       background: '#0a0a0a',
       color: 'white'
     }}>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <form onSubmit={handleSubmit} style={{
         background: 'rgba(255, 255, 255, 0.05)',
         padding: '2rem',
@@ -108,10 +115,6 @@ export default function AdminLogin() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
-        
-        {message && (
-          <p style={{ marginTop: '1rem', textAlign: 'center' }}>{message}</p>
-        )}
       </form>
     </div>
   );

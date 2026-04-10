@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import styles from './dashboard.module.css';
+import Toast from '@/components/Toast';
 
 const COLORS = ['#0058a9', '#fdd802', '#ea2429', '#10b981'];
 
@@ -17,6 +18,11 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [cleanupMonths, setCleanupMonths] = useState('3');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
 
   const loadData = async () => {
     try {
@@ -64,7 +70,10 @@ export default function Dashboard() {
   }, []);
 
   const handleRedeem = async () => {
-    if (!redeemCode || !selectedBranch) return alert('Enter code and select branch');
+    if (!redeemCode || !selectedBranch) {
+      showToast('Please enter voucher code and select branch', 'error');
+      return;
+    }
 
     try {
       const res = await fetch('/api/admin/vouchers', {
@@ -76,20 +85,24 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        alert('Voucher redeemed successfully!');
+        showToast('Voucher redeemed successfully!', 'success');
         setRedeemCode('');
+        setSelectedBranch('');
         loadData();
       } else {
-        alert(data.error || 'Failed to redeem');
+        showToast(data.error || 'Failed to redeem voucher', 'error');
       }
     } catch (error) {
-      alert('Server error. Please try again.');
+      showToast('Server error. Please try again.', 'error');
     }
   };
 
   const handleSetLimit = async () => {
     const maxVouchers = parseInt(newLimit);
-    if (isNaN(maxVouchers) || maxVouchers < 0) return alert('Enter a valid number');
+    if (isNaN(maxVouchers) || maxVouchers < 0) {
+      showToast('Please enter a valid number', 'error');
+      return;
+    }
 
     try {
       const res = await fetch('/api/admin/limit', {
@@ -101,20 +114,23 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        alert('Voucher limit updated!');
+        showToast('Voucher limit updated successfully!', 'success');
         setNewLimit('');
         loadData();
       } else {
-        alert(data.error || 'Failed to update limit');
+        showToast(data.error || 'Failed to update limit', 'error');
       }
     } catch (error) {
-      alert('Server error. Please try again.');
+      showToast('Server error. Please try again.', 'error');
     }
   };
 
   const handleCleanup = async () => {
     const months = parseInt(cleanupMonths);
-    if (isNaN(months) || months < 1) return alert('Enter a valid number of months');
+    if (isNaN(months) || months < 1) {
+      showToast('Please enter a valid number of months', 'error');
+      return;
+    }
 
     if (!confirm(`Are you sure you want to delete all data older than ${months} months? This cannot be undone!`)) {
       return;
@@ -130,13 +146,13 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(data.message);
+        showToast(data.message, 'success');
         loadData();
       } else {
-        alert(data.error || 'Failed to cleanup');
+        showToast(data.error || 'Failed to cleanup data', 'error');
       }
     } catch (error) {
-      alert('Server error. Please try again.');
+      showToast('Server error. Please try again.', 'error');
     }
   };
 
@@ -156,6 +172,7 @@ export default function Dashboard() {
 
   return (
     <div className={styles.page}>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <div className={styles.header}>
         <div>
           <h1>Admin Dashboard</h1>
