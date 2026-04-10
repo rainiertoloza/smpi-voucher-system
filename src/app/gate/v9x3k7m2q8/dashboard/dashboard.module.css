@@ -1,6 +1,7 @@
 .page {
   padding: 1.5rem;
-  max-width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -87,8 +88,8 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto 1fr;
   gap: 1rem;
-  padding-right: 0.5rem;
   padding-bottom: 2rem;
+  width: 100%;
 }
 
 .statsSection {
@@ -154,11 +155,16 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 1rem, 1rem, 0.5rem, 1rem;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1.5rem;
   align-items: start;
+}
+
+.actionSection {
+  display: flex;
+  flex-direction: column;
 }
 
 .actionSection h3 {
@@ -177,6 +183,7 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .input {
