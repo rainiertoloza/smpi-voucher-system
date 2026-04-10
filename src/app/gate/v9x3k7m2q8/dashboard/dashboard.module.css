@@ -9,7 +9,7 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
@@ -52,30 +52,24 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  background: linear-gradient(135deg, rgba(0, 88, 169, 0.15) 0%, rgba(234, 36, 41, 0.1) 100%);
-  border: 1px solid rgba(0, 88, 169, 0.3);
-  padding: 1rem;
-  border-radius: 12px;
-  transition: transform 0.2s;
-}
-
-.limitBadge:hover {
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 88, 169, 0.3);
 }
 
 .limitLabel {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.9);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin: 0;
 }
 
 .limitValue {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
-  color: var(--foreground);
-  margin: 0.25rem 0 0 0;
+  color: white;
+  margin-top: 0.15rem;
 }
 
 .loading {
@@ -164,6 +158,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1.5rem;
+  align-items: start;
 }
 
 .actionSection h3 {
