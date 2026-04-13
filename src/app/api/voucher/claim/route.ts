@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { fullName, email, phone } = await req.json();
 
     if (!fullName || !email || !phone) {
-      return NextResponse.json({ error: 'All fields required' }, { status: 400 });
+      return NextResponse.json({ error: '⚠️ All fields are required' }, { status: 400 });
     }
 
     // Normalize email
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     if (!ipRateLimit.allowed) {
       const resetIn = Math.ceil((ipRateLimit.resetTime - Date.now()) / 1000 / 60);
       return NextResponse.json(
-        { error: `Too many requests. Please try again in ${resetIn} minutes.` },
+        { error: `⏰ Too many requests. Please try again in ${resetIn} minutes.` },
         { status: 429 }
       );
     }
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     
     if (!emailRateLimit.allowed) {
       return NextResponse.json(
-        { error: 'This email has already claimed a voucher today.' },
+        { error: '🚫 This email has already claimed a voucher today. Please try again tomorrow.' },
         { status: 429 }
       );
     }
@@ -75,6 +75,6 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error('Claim error:', error);
-    return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || '💥 Server error. Please try again.' }, { status: 500 });
   }
 }

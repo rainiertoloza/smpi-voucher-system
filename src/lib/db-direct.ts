@@ -33,7 +33,7 @@ export const dbDirect = {
     });
     
     if (existing.rows.length > 0) {
-      throw new Error('Email already claimed a voucher');
+      throw new Error('🚫 This email has already been used to claim a voucher.');
     }
 
     await db.execute({

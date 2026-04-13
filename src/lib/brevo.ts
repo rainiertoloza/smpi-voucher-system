@@ -78,7 +78,7 @@ export async function sendVoucherEmail(
     const result = await client.transactionalEmails.sendTransacEmail({
       sender: {
         name: 'SMPI Voucher System',
-        email: process.env.BREVO_SENDER_EMAIL || 'noreply@smpi.com'
+        email: process.env.BREVO_SENDER_EMAIL || 'smpimarketing787@gmail.com'
       },
       to: [{ email, name: fullName }],
       subject: 'Your SMPI Voucher Code',
