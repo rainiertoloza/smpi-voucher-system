@@ -38,7 +38,7 @@ export default function ClaimPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        showToast(data.error || '❌ Failed to claim voucher. Please try again.', 'error');
+        showToast(data.error || 'Failed to claim voucher. Please try again.', 'error');
         setLoading(false);
         return;
       }
@@ -47,11 +47,11 @@ export default function ClaimPage() {
         showToast('⚠️ ' + data.warning, 'info');
       } else {
         setSubmitted(true);
-        showToast('✅ Voucher sent to your email!', 'success');
+        showToast('Voucher sent to your email!', 'success');
       }
     } catch (error) {
       console.error('Claim error:', error);
-      showToast('💥 Server error. Please try again later.', 'error');
+      showToast('Server error. Please try again later.', 'error');
     } finally {
       setLoading(false);
     }
