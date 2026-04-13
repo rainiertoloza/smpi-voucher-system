@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import styles from './dashboard.module.css';
 import Toast from '@/components/Toast';
+import Modal from '@/components/Modal';
 
 const COLORS = ['#0058a9', '#fdd802'];
 
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [cleanupMonths, setCleanupMonths] = useState('3');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [showCleanupModal, setShowCleanupModal] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info') => {
     setToast({ message, type });
@@ -132,9 +134,12 @@ export default function Dashboard() {
       return;
     }
 
-    if (!confirm(`Are you sure you want to delete all data older than ${months} months? This cannot be undone!`)) {
-      return;
-    }
+    setShowCleanupModal(true);
+  };
+
+  const confirmCleanup = async () => {
+    setShowCleanupModal(false);
+    const months = parseInt(cleanupMonths);
 
     try {
       const res = await fetch('/api/admin/cleanup', {
@@ -176,6 +181,18 @@ export default function Dashboard() {
   return (
     <div className={styles.page}>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      
+      <Modal
+        isOpen={showCleanupModal}
+        onClose={() => setShowCleanupModal(false)}
+        onConfirm={confirmCleanup}
+        title="Delete Old Data"
+        message={`Are you sure you want to delete all vouchers older than ${cleanupMonths} months? This action cannot be undone and will permanently remove all associated customer data.`}
+        confirmText="Delete Data"
+        cancelText="Cancel"
+        type="danger"
+      />
+      
       <div className={styles.header}>
         <div>
           <h1>Admin Dashboard</h1>

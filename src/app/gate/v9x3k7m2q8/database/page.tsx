@@ -4,11 +4,17 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './database.module.css';
 import Toast from '@/components/Toast';
+import Modal from '@/components/Modal';
 
 export default function DatabaseViewer() {
   const [activeTab, setActiveTab] = useState('vouchers');
   const [data, setData] = useState<any>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; voucherId: string; voucherCode: string }>({ 
+    isOpen: false, 
+    voucherId: '', 
+    voucherCode: '' 
+  });
 
   const showToast = (message: string, type: 'success' | 'error' | 'info') => {
     setToast({ message, type });
@@ -50,7 +56,12 @@ export default function DatabaseViewer() {
   };
 
   const handleDelete = async (voucherId: string, voucherCode: string) => {
-    if (!confirm(`Delete voucher ${voucherCode}? This cannot be undone!`)) return;
+    setDeleteModal({ isOpen: true, voucherId, voucherCode });
+  };
+
+  const confirmDelete = async () => {
+    const { voucherId, voucherCode } = deleteModal;
+    setDeleteModal({ isOpen: false, voucherId: '', voucherCode: '' });
 
     try {
       const res = await fetch(`/api/admin/vouchers/delete?id=${voucherId}`, {
@@ -58,7 +69,7 @@ export default function DatabaseViewer() {
       });
 
       if (res.ok) {
-        showToast('Voucher deleted successfully!', 'success');
+        showToast(`Voucher ${voucherCode} deleted successfully!`, 'success');
         loadData();
       } else {
         const data = await res.json();
@@ -74,6 +85,18 @@ export default function DatabaseViewer() {
   return (
     <div className={styles.page}>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, voucherId: '', voucherCode: '' })}
+        onConfirm={confirmDelete}
+        title="Delete Voucher"
+        message={`Are you sure you want to delete voucher ${deleteModal.voucherCode}? This will permanently remove the voucher and associated customer data. This action cannot be undone.`}
+        confirmText="Delete Voucher"
+        cancelText="Cancel"
+        type="danger"
+      />
+      
       <div className={styles.header}>
         <div>
           <h1>Database Viewer</h1>
