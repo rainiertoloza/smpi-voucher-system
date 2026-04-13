@@ -121,7 +121,8 @@ export default function DatabaseViewer() {
                   <tr>
                     <th>ID</th>
                     <th>Code</th>
-                    <th>Customer ID</th>
+                    <th>Customer Name</th>
+                    <th>Customer Email</th>
                     <th>Status</th>
                     <th>Branch ID</th>
                     <th>Created At</th>
@@ -135,6 +136,7 @@ export default function DatabaseViewer() {
                     <tr key={v.id}>
                       <td><code>{v.id}</code></td>
                       <td><code className={styles.code}>{v.code}</code></td>
+                      <td>{v.customer.fullName}</td>
                       <td><code>{v.customer.email}</code></td>
                       <td><span className={`${styles.badge} ${styles[v.status.toLowerCase()]}`}>{v.status}</span></td>
                       <td>{v.branch?.name || '-'}</td>

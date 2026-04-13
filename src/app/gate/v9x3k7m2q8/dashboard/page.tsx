@@ -365,6 +365,7 @@ export default function Dashboard() {
                   <th>Status</th>
                   <th>Branch</th>
                   <th>Created</th>
+                  <th>Expires</th>
                 </tr>
               </thead>
               <tbody>
@@ -380,6 +381,7 @@ export default function Dashboard() {
                     </td>
                     <td>{v.branch?.name || '-'}</td>
                     <td>{new Date(v.createdAt).toLocaleDateString()}</td>
+                    <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleDateString() : '-'}</td>
                   </tr>
                 ))}
               </tbody>

@@ -94,6 +94,7 @@ export const dbDirect = {
       code: v.code,
       status: v.status,
       createdAt: v.createdAt,
+      expiresAt: v.expiresAt,
       usedAt: v.usedAt,
       customer: { fullName: v.fullName, email: v.email, phone: v.phone },
       branch: v.branchName ? { name: v.branchName } : null
