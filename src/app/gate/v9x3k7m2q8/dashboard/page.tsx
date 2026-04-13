@@ -165,10 +165,13 @@ export default function Dashboard() {
   if (error) return <div className={styles.loading}>Error: {error}</div>;
   if (!analytics || !limit) return <div className={styles.loading}>Loading dashboard...</div>;
 
-  const pieData = [
-    { name: 'Active', value: analytics.active },
-    { name: 'Redeemed', value: analytics.redeemed }
-  ];
+  const hasVouchers = analytics.total > 0;
+  const pieData = hasVouchers
+    ? [
+        { name: 'Active', value: analytics.active },
+        { name: 'Redeemed', value: analytics.redeemed }
+      ]
+    : [{ name: 'No Data', value: 1 }];
 
   return (
     <div className={styles.page}>
@@ -249,11 +252,11 @@ export default function Dashboard() {
                 cy="50%"
                 innerRadius={50}
                 outerRadius={70}
-                paddingAngle={5}
+                paddingAngle={hasVouchers ? 5 : 0}
                 dataKey="value"
               >
                 {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={hasVouchers ? COLORS[index % COLORS.length] : '#6b7280'} />
                 ))}
               </Pie>
               <Tooltip 
@@ -262,12 +265,19 @@ export default function Dashboard() {
             </PieChart>
           </ResponsiveContainer>
           <div className={styles.legend}>
-            {pieData.map((entry, index) => (
-              <div key={entry.name} className={styles.legendItem}>
-                <span className={styles.legendColor} style={{ background: COLORS[index] }}></span>
-                <span>{entry.name}: {entry.value}</span>
+            {hasVouchers ? (
+              pieData.map((entry, index) => (
+                <div key={entry.name} className={styles.legendItem}>
+                  <span className={styles.legendColor} style={{ background: COLORS[index] }}></span>
+                  <span>{entry.name}: {entry.value}</span>
+                </div>
+              ))
+            ) : (
+              <div className={styles.legendItem}>
+                <span className={styles.legendColor} style={{ background: '#6b7280' }}></span>
+                <span>No vouchers yet</span>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
