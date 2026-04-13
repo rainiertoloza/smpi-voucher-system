@@ -186,7 +186,6 @@ export default function DatabaseViewer() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Code</th>
                     <th>Customer Name</th>
                     <th>Customer Email</th>
@@ -271,25 +270,23 @@ export default function DatabaseViewer() {
         {activeTab === 'customers' && (
           <div className={styles.tableCard}>
             <h2>Customers Table ({filteredCustomers.length})</h2>
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Created At</th>
-                    <th>Voucher Code</th>
-                    <th className={styles.searchHeader}>
-                      <input
+            <input
                         type="text"
                         placeholder="🔍 Search..."
                         value={customerSearch}
                         onChange={(e) => { setCustomerSearch(e.target.value); setCustomerPage(1); }}
                         className={styles.searchInput}
                       />
-                    </th>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Voucher Code</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Created At</th>
+                    <th className={styles.searchHeader}></th>
                   </tr>
                 </thead>
                 <tbody>

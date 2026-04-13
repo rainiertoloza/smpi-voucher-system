@@ -377,6 +377,13 @@ export default function Dashboard() {
         <div className={styles.tableCard}>
           <div className={styles.tableHeader}>
             <h3>All Vouchers ({filteredVouchers.length})</h3>
+            <input
+                      type="text"
+                      placeholder="🔍 Search..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className={styles.searchInput}
+                    />
           </div>
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -389,15 +396,7 @@ export default function Dashboard() {
                   <th>Branch</th>
                   <th>Created</th>
                   <th>Expires</th>
-                  <th className={styles.searchHeader}>
-                    <input
-                      type="text"
-                      placeholder="🔍 Search..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className={styles.searchInput}
-                    />
-                  </th>
+                  <th className={styles.searchHeader}></th>
                 </tr>
               </thead>
               <tbody>
