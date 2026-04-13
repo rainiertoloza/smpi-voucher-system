@@ -21,6 +21,8 @@ export default function Dashboard() {
   const [cleanupMonths, setCleanupMonths] = useState('3');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [showCleanupModal, setShowCleanupModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const showToast = (message: string, type: 'success' | 'error' | 'info') => {
     setToast({ message, type });
@@ -167,6 +169,16 @@ export default function Dashboard() {
     v.customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     v.customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredVouchers.length / itemsPerPage);
+  const paginatedVouchers = filteredVouchers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   if (error) return <div className={styles.loading}>Error: {error}</div>;
   if (!analytics || !limit) return <div className={styles.loading}>Loading dashboard...</div>;
@@ -365,13 +377,6 @@ export default function Dashboard() {
         <div className={styles.tableCard}>
           <div className={styles.tableHeader}>
             <h3>All Vouchers ({filteredVouchers.length})</h3>
-            <input
-              type="text"
-              placeholder="🔍 Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={styles.searchInput}
-            />
           </div>
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -384,27 +389,68 @@ export default function Dashboard() {
                   <th>Branch</th>
                   <th>Created</th>
                   <th>Expires</th>
+                  <th className={styles.searchHeader}>
+                    <input
+                      type="text"
+                      placeholder="🔍 Search..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className={styles.searchInput}
+                    />
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredVouchers.map(v => (
-                  <tr key={v.id}>
-                    <td><code className={styles.code}>{v.code}</code></td>
-                    <td>{v.customer.fullName}</td>
-                    <td className={styles.email}>{v.customer.email}</td>
-                    <td>
-                      <span className={`${styles.badge} ${styles[v.status.toLowerCase()]}`}>
-                        {v.status}
-                      </span>
-                    </td>
-                    <td>{v.branch?.name || '-'}</td>
-                    <td>{new Date(v.createdAt).toLocaleDateString()}</td>
-                    <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleDateString() : '-'}</td>
-                  </tr>
-                ))}
+                {paginatedVouchers.length > 0 ? (
+                  paginatedVouchers.map(v => (
+                    <tr key={v.id}>
+                      <td><code className={styles.code}>{v.code}</code></td>
+                      <td>{v.customer.fullName}</td>
+                      <td className={styles.email}>{v.customer.email}</td>
+                      <td>
+                        <span className={`${styles.badge} ${styles[v.status.toLowerCase()]}`}>
+                          {v.status}
+                        </span>
+                      </td>
+                      <td>{v.branch?.name || '-'}</td>
+                      <td>{new Date(v.createdAt).toLocaleDateString()}</td>
+                      <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleDateString() : '-'}</td>
+                      <td></td>
+                    </tr>
+                  ))
+                ) : (
+                  Array.from({ length: itemsPerPage }).map((_, i) => (
+                    <tr key={`empty-${i}`} className={styles.emptyRow}>
+                      <td colSpan={8} className={styles.emptyCell}>
+                        {i === 0 && 'No vouchers found'}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className={styles.pageBtn}
+              >
+                ← Previous
+              </button>
+              <span className={styles.pageInfo}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className={styles.pageBtn}
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

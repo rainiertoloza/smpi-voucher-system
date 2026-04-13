@@ -55,6 +55,11 @@
   margin-bottom: 2rem;
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab,
@@ -104,6 +109,29 @@
   font-size: 1.3rem;
 }
 
+.searchHeader {
+  text-align: right !important;
+  vertical-align: middle !important;
+}
+
+.searchInput {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--foreground);
+  font-size: 0.85rem;
+  width: 200px;
+  max-width: 100%;
+  transition: all 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .tableWrapper {
   overflow-x: auto;
   border-radius: 10px;
@@ -142,6 +170,21 @@
 
 .table tbody tr:hover {
   background: rgba(99, 102, 241, 0.05);
+}
+
+.emptyRow {
+  height: 53px;
+}
+
+.emptyRow:hover {
+  background: transparent !important;
+}
+
+.emptyCell {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .table code {
@@ -257,6 +300,46 @@
   transform: scale(1.05);
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pageBtn {
+  padding: 0.5rem 1rem;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  color: var(--foreground);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.25);
+  transform: translateY(-1px);
+}
+
+.pageBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-width: 120px;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .page {
     padding: 1rem;
@@ -355,6 +438,24 @@
     font-size: 0.75rem;
     padding: 0.4rem 0.75rem;
     word-break: break-all;
+  }
+
+  .searchInput {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .pageBtn {
+    width: 100%;
+  }
+
+  .pageInfo {
+    width: 100%;
   }
 }
 

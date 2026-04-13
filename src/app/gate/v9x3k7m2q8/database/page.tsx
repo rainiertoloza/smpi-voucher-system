@@ -15,6 +15,13 @@ export default function DatabaseViewer() {
     voucherId: '', 
     voucherCode: '' 
   });
+  const [voucherSearch, setVoucherSearch] = useState('');
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [branchSearch, setBranchSearch] = useState('');
+  const [voucherPage, setVoucherPage] = useState(1);
+  const [customerPage, setCustomerPage] = useState(1);
+  const [branchPage, setBranchPage] = useState(1);
+  const itemsPerPage = 10;
 
   const showToast = (message: string, type: 'success' | 'error' | 'info') => {
     setToast({ message, type });
@@ -83,6 +90,42 @@ export default function DatabaseViewer() {
 
   if (!data) return <div className={styles.loading}>Loading...</div>;
 
+  const filteredVouchers = data.vouchers.filter((v: any) =>
+    v.code.toLowerCase().includes(voucherSearch.toLowerCase()) ||
+    v.customer.fullName.toLowerCase().includes(voucherSearch.toLowerCase()) ||
+    v.customer.email.toLowerCase().includes(voucherSearch.toLowerCase())
+  );
+
+  const filteredCustomers = data.vouchers.filter((v: any) =>
+    v.customer.fullName.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    v.customer.email.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    v.customer.phone.toLowerCase().includes(customerSearch.toLowerCase())
+  );
+
+  const filteredBranches = data.branches.filter((b: any) =>
+    b.name.toLowerCase().includes(branchSearch.toLowerCase()) ||
+    (b.location && b.location.toLowerCase().includes(branchSearch.toLowerCase()))
+  );
+
+  const paginatedVouchers = filteredVouchers.slice(
+    (voucherPage - 1) * itemsPerPage,
+    voucherPage * itemsPerPage
+  );
+
+  const paginatedCustomers = filteredCustomers.slice(
+    (customerPage - 1) * itemsPerPage,
+    customerPage * itemsPerPage
+  );
+
+  const paginatedBranches = filteredBranches.slice(
+    (branchPage - 1) * itemsPerPage,
+    branchPage * itemsPerPage
+  );
+
+  const voucherTotalPages = Math.ceil(filteredVouchers.length / itemsPerPage);
+  const customerTotalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+  const branchTotalPages = Math.ceil(filteredBranches.length / itemsPerPage);
+
   return (
     <div className={styles.page}>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -138,7 +181,7 @@ export default function DatabaseViewer() {
       <div className={styles.content}>
         {activeTab === 'vouchers' && (
           <div className={styles.tableCard}>
-            <h2>Vouchers Table</h2>
+            <h2>Vouchers Table ({filteredVouchers.length})</h2>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -153,40 +196,81 @@ export default function DatabaseViewer() {
                     <th>Used At</th>
                     <th>Expires At</th>
                     <th>Actions</th>
+                    <th className={styles.searchHeader}>
+                      <input
+                        type="text"
+                        placeholder="🔍 Search..."
+                        value={voucherSearch}
+                        onChange={(e) => { setVoucherSearch(e.target.value); setVoucherPage(1); }}
+                        className={styles.searchInput}
+                      />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.vouchers.map((v: any) => (
-                    <tr key={v.id}>
-                      <td><code>{v.id}</code></td>
-                      <td><code className={styles.code}>{v.code}</code></td>
-                      <td>{v.customer.fullName}</td>
-                      <td><code>{v.customer.email}</code></td>
-                      <td><span className={`${styles.badge} ${styles[v.status.toLowerCase()]}`}>{v.status}</span></td>
-                      <td>{v.branch?.name || '-'}</td>
-                      <td>{new Date(v.createdAt).toLocaleString()}</td>
-                      <td>{v.usedAt ? new Date(v.usedAt).toLocaleString() : '-'}</td>
-                      <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleString() : '-'}</td>
-                      <td>
-                        <button 
-                          onClick={() => handleDelete(v.id, v.code)}
-                          className={styles.deleteBtn}
-                          title="Delete voucher"
-                        >
-                          🗑️
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {paginatedVouchers.length > 0 ? (
+                    paginatedVouchers.map((v: any) => (
+                      <tr key={v.id}>
+                        <td><code>{v.id}</code></td>
+                        <td><code className={styles.code}>{v.code}</code></td>
+                        <td>{v.customer.fullName}</td>
+                        <td><code>{v.customer.email}</code></td>
+                        <td><span className={`${styles.badge} ${styles[v.status.toLowerCase()]}`}>{v.status}</span></td>
+                        <td>{v.branch?.name || '-'}</td>
+                        <td>{new Date(v.createdAt).toLocaleString()}</td>
+                        <td>{v.usedAt ? new Date(v.usedAt).toLocaleString() : '-'}</td>
+                        <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleString() : '-'}</td>
+                        <td>
+                          <button 
+                            onClick={() => handleDelete(v.id, v.code)}
+                            className={styles.deleteBtn}
+                            title="Delete voucher"
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                        <td></td>
+                      </tr>
+                    ))
+                  ) : (
+                    Array.from({ length: itemsPerPage }).map((_, i) => (
+                      <tr key={`empty-${i}`} className={styles.emptyRow}>
+                        <td colSpan={11} className={styles.emptyCell}>
+                          {i === 0 && 'No vouchers found'}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
+            {voucherTotalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  onClick={() => setVoucherPage(p => Math.max(1, p - 1))}
+                  disabled={voucherPage === 1}
+                  className={styles.pageBtn}
+                >
+                  ← Previous
+                </button>
+                <span className={styles.pageInfo}>
+                  Page {voucherPage} of {voucherTotalPages}
+                </span>
+                <button
+                  onClick={() => setVoucherPage(p => Math.min(voucherTotalPages, p + 1))}
+                  disabled={voucherPage === voucherTotalPages}
+                  className={styles.pageBtn}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === 'customers' && (
           <div className={styles.tableCard}>
-            <h2>Customers Table</h2>
+            <h2>Customers Table ({filteredCustomers.length})</h2>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -197,28 +281,69 @@ export default function DatabaseViewer() {
                     <th>Phone</th>
                     <th>Created At</th>
                     <th>Voucher Code</th>
+                    <th className={styles.searchHeader}>
+                      <input
+                        type="text"
+                        placeholder="🔍 Search..."
+                        value={customerSearch}
+                        onChange={(e) => { setCustomerSearch(e.target.value); setCustomerPage(1); }}
+                        className={styles.searchInput}
+                      />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.vouchers.map((v: any) => (
-                    <tr key={v.customer.email}>
-                      <td><code>{v.id.substring(0, 12)}...</code></td>
-                      <td>{v.customer.fullName}</td>
-                      <td>{v.customer.email}</td>
-                      <td>{v.customer.phone}</td>
-                      <td>{new Date(v.createdAt).toLocaleString()}</td>
-                      <td><code className={styles.code}>{v.code}</code></td>
-                    </tr>
-                  ))}
+                  {paginatedCustomers.length > 0 ? (
+                    paginatedCustomers.map((v: any) => (
+                      <tr key={v.customer.email}>
+                        <td><code>{v.id.substring(0, 12)}...</code></td>
+                        <td>{v.customer.fullName}</td>
+                        <td>{v.customer.email}</td>
+                        <td>{v.customer.phone}</td>
+                        <td>{new Date(v.createdAt).toLocaleString()}</td>
+                        <td><code className={styles.code}>{v.code}</code></td>
+                        <td></td>
+                      </tr>
+                    ))
+                  ) : (
+                    Array.from({ length: itemsPerPage }).map((_, i) => (
+                      <tr key={`empty-${i}`} className={styles.emptyRow}>
+                        <td colSpan={7} className={styles.emptyCell}>
+                          {i === 0 && 'No customers found'}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
+            {customerTotalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  onClick={() => setCustomerPage(p => Math.max(1, p - 1))}
+                  disabled={customerPage === 1}
+                  className={styles.pageBtn}
+                >
+                  ← Previous
+                </button>
+                <span className={styles.pageInfo}>
+                  Page {customerPage} of {customerTotalPages}
+                </span>
+                <button
+                  onClick={() => setCustomerPage(p => Math.min(customerTotalPages, p + 1))}
+                  disabled={customerPage === customerTotalPages}
+                  className={styles.pageBtn}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === 'branches' && (
           <div className={styles.tableCard}>
-            <h2>Branches Table</h2>
+            <h2>Branches Table ({filteredBranches.length})</h2>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -227,23 +352,64 @@ export default function DatabaseViewer() {
                     <th>Name</th>
                     <th>Location</th>
                     <th>Redemptions</th>
+                    <th className={styles.searchHeader}>
+                      <input
+                        type="text"
+                        placeholder="🔍 Search..."
+                        value={branchSearch}
+                        onChange={(e) => { setBranchSearch(e.target.value); setBranchPage(1); }}
+                        className={styles.searchInput}
+                      />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.branches.map((b: any) => {
-                    const redemptions = data.analytics.branchData.find((bd: any) => bd.name === b.name)?.count || 0;
-                    return (
-                      <tr key={b.id}>
-                        <td><code>{b.id}</code></td>
-                        <td>{b.name}</td>
-                        <td>{b.location || '-'}</td>
-                        <td><span className={styles.countBadge}>{redemptions}</span></td>
+                  {paginatedBranches.length > 0 ? (
+                    paginatedBranches.map((b: any) => {
+                      const redemptions = data.analytics.branchData.find((bd: any) => bd.name === b.name)?.count || 0;
+                      return (
+                        <tr key={b.id}>
+                          <td><code>{b.id}</code></td>
+                          <td>{b.name}</td>
+                          <td>{b.location || '-'}</td>
+                          <td><span className={styles.countBadge}>{redemptions}</span></td>
+                          <td></td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    Array.from({ length: itemsPerPage }).map((_, i) => (
+                      <tr key={`empty-${i}`} className={styles.emptyRow}>
+                        <td colSpan={5} className={styles.emptyCell}>
+                          {i === 0 && 'No branches found'}
+                        </td>
                       </tr>
-                    );
-                  })}
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
+            {branchTotalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  onClick={() => setBranchPage(p => Math.max(1, p - 1))}
+                  disabled={branchPage === 1}
+                  className={styles.pageBtn}
+                >
+                  ← Previous
+                </button>
+                <span className={styles.pageInfo}>
+                  Page {branchPage} of {branchTotalPages}
+                </span>
+                <button
+                  onClick={() => setBranchPage(p => Math.min(branchTotalPages, p + 1))}
+                  disabled={branchPage === branchTotalPages}
+                  className={styles.pageBtn}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </div>
         )}
 
