@@ -6,7 +6,7 @@ import Toast from '@/components/Toast';
 
 export default function ClaimPage() {
   const [formData, setFormData] = useState({ fullName: '', email: '', phone: '' });
-  const [voucher, setVoucher] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
@@ -43,8 +43,8 @@ export default function ClaimPage() {
       }
 
       const data = await res.json();
-      setVoucher(data.code);
-      showToast('Voucher claimed successfully!', 'success');
+      setSubmitted(true);
+      showToast('Voucher sent to your email!', 'success');
     } catch (error) {
       showToast('Server error. Please try again.', 'error');
     } finally {
@@ -52,20 +52,35 @@ export default function ClaimPage() {
     }
   };
 
-  const copyVoucher = () => {
-    navigator.clipboard.writeText(voucher);
-    showToast('Voucher code copied to clipboard!', 'success');
-  };
-
-  if (voucher) {
+  if (submitted) {
     return (
       <div className={styles.page}>
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         <div className={styles.card}>
-          <h1 className={styles.success}>✅ Success!</h1>
-          <p>Your voucher code:</p>
-          <div className={styles.voucherCode}>{voucher}</div>
-          <button onClick={copyVoucher} className={styles.btn}>Copy Code</button>
+          <div className={styles.successIcon}>📧</div>
+          <h1 className={styles.success}>Check Your Email!</h1>
+          <p className={styles.successText}>
+            Your voucher code has been sent to:
+          </p>
+          <p className={styles.email}>{formData.email}</p>
+          <div className={styles.infoBox}>
+            <p><strong>What's next?</strong></p>
+            <ul className={styles.steps}>
+              <li>Check your inbox (and spam folder)</li>
+              <li>Save your voucher code</li>
+              <li>Valid for 30 days from today</li>
+              <li>Redeem at any SMPI branch</li>
+            </ul>
+          </div>
+          <button 
+            onClick={() => {
+              setSubmitted(false);
+              setFormData({ fullName: '', email: '', phone: '' });
+            }} 
+            className={styles.btnSecondary}
+          >
+            Claim Another Voucher
+          </button>
         </div>
       </div>
     );
@@ -76,6 +91,7 @@ export default function ClaimPage() {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <form className={styles.card} onSubmit={handleSubmit}>
         <h1>Claim Your Voucher</h1>
+        <p className={styles.subtitle}>Fill in your details to receive your voucher code via email</p>
         <input
           type="text"
           placeholder="Full Name"
@@ -105,8 +121,9 @@ export default function ClaimPage() {
           <p className={styles.error}>Phone must start with 09 and have 11 digits</p>
         )}
         <button type="submit" disabled={loading} className={styles.btn}>
-          {loading ? 'Processing...' : 'Claim Voucher'}
+          {loading ? 'Sending...' : 'Claim Voucher'}
         </button>
+        <p className={styles.note}>📧 Voucher code will be sent to your email</p>
       </form>
     </div>
   );

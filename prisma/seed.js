@@ -1,12 +1,21 @@
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const { nanoid } = require('nanoid');
+const path = require('path');
 
-const db = new Database('./dev.db');
+const dbPath = path.join(__dirname, 'dev.db');
+const db = new Database(dbPath);
 
 async function main() {
   const hashedPassword = await bcrypt.hash('admin123', 10);
   const adminId = `admin_${nanoid(10)}`;
+  
+  // Insert voucher limit
+  const limitExists = db.prepare('SELECT * FROM VoucherLimit WHERE id = 1').get();
+  if (!limitExists) {
+    db.prepare('INSERT INTO VoucherLimit (id, maxVouchers, currentCount) VALUES (?, ?, ?)').run(1, 1000, 0);
+    console.log('✅ Created voucher limit');
+  }
   
   // Insert admin
   const adminExists = db.prepare('SELECT * FROM Admin WHERE username = ?').get('admin');

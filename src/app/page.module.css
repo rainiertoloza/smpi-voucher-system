@@ -67,7 +67,7 @@
   display: inline-block;
   padding: 1.25rem 3rem;
   background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
-  color: #000;
+  color: white;
   border-radius: 50px;
   font-weight: 700;
   font-size: 1.2rem;

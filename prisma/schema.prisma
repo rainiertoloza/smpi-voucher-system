@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Customer {
@@ -39,4 +40,10 @@ model Admin {
   id       String @id @default(cuid())
   username String @unique
   password String
+}
+
+model VoucherLimit {
+  id           Int @id @default(1)
+  maxVouchers  Int @default(1000)
+  currentCount Int @default(0)
 }
