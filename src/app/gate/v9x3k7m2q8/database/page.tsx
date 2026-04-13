@@ -70,7 +70,8 @@ export default function DatabaseViewer() {
 
       if (res.ok) {
         showToast(`Voucher ${voucherCode} deleted successfully!`, 'success');
-        loadData();
+        // Delay reload to show toast
+        setTimeout(() => loadData(), 500);
       } else {
         const data = await res.json();
         showToast(data.error || 'Failed to delete voucher', 'error');

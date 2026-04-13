@@ -151,8 +151,9 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        showToast(data.message, 'success');
-        loadData();
+        showToast(`✅ Old data cleaned up successfully!`, 'success');
+        // Delay reload to show toast
+        setTimeout(() => loadData(), 500);
       } else {
         showToast(data.error || 'Failed to cleanup data', 'error');
       }
