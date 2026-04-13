@@ -71,6 +71,10 @@ export async function sendVoucherEmail(
   `;
 
   try {
+    console.log('Sending email to:', email);
+    console.log('Brevo API Key exists:', !!process.env.BREVO_API_KEY);
+    console.log('Sender email:', process.env.BREVO_SENDER_EMAIL);
+    
     const result = await client.transactionalEmails.sendTransacEmail({
       sender: {
         name: 'SMPI Voucher System',
@@ -81,9 +85,11 @@ export async function sendVoucherEmail(
       htmlContent
     });
     
+    console.log('Email sent successfully:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error: any) {
     console.error('Brevo email error:', error);
-    throw new Error('Failed to send email');
+    console.error('Error details:', JSON.stringify(error, null, 2));
+    throw new Error(`Failed to send email: ${error.message || error.toString()}`);
   }
 }

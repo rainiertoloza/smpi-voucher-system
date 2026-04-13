@@ -35,17 +35,22 @@ export default function ClaimPage() {
         body: JSON.stringify(formData)
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         showToast(data.error || 'Failed to claim voucher', 'error');
         setLoading(false);
         return;
       }
 
-      const data = await res.json();
-      setSubmitted(true);
-      showToast('Voucher sent to your email!', 'success');
+      if (data.warning) {
+        showToast(data.warning, 'info');
+      } else {
+        setSubmitted(true);
+        showToast('Voucher sent to your email!', 'success');
+      }
     } catch (error) {
+      console.error('Claim error:', error);
       showToast('Server error. Please try again.', 'error');
     } finally {
       setLoading(false);
