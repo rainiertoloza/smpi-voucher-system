@@ -195,7 +195,7 @@ export default function DatabaseViewer() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Code</th>
+                    <th>Vouchers Code</th>
                     <th>Customer Name</th>
                     <th>Customer Email</th>
                     <th>Status</th>
