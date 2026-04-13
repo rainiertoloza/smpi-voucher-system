@@ -22,9 +22,20 @@ export const metadata: Metadata = {
   description: "Claim your SMPI voucher - Fast and secure voucher management system",
   keywords: "voucher, SMPI, claim, discount",
   authors: [{ name: "SMPI" }],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: 'cover' // iOS safe area support
+  },
   themeColor: "#0058a9",
   robots: "index, follow",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SMPI Voucher'
+  },
 };
 
 export default function RootLayout({
@@ -37,6 +48,8 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body>
         {children}

@@ -9,10 +9,15 @@
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 9999;
   animation: slideIn 0.3s ease-out;
   min-width: 300px;
   max-width: 500px;
+  /* iOS specific fixes */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
 }
 
 @keyframes slideIn {
@@ -68,10 +73,23 @@
   justify-content: center;
   opacity: 0.8;
   transition: opacity 0.2s;
+  /* Better touch target for mobile */
+  min-width: 44px;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .close:hover {
   opacity: 1;
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .toast {
+    /* Prevent iOS Safari from adding extra padding */
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
 }
 
 @media (max-width: 768px) {
@@ -80,5 +98,7 @@
     right: 1rem;
     left: 1rem;
     min-width: auto;
+    /* Add safe area for iOS notch */
+    top: max(1rem, env(safe-area-inset-top));
   }
 }

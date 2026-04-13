@@ -74,6 +74,12 @@
   transition: all 0.3s ease;
   -webkit-appearance: none;
   appearance: none;
+  /* iOS specific fixes */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: text;
+  user-select: text;
+  /* Prevent iOS zoom on focus */
+  font-size: max(1rem, 16px);
 }
 
 .input::placeholder {
@@ -115,6 +121,12 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Active state for mobile touch */
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 15px rgba(253, 216, 2, 0.4);
 }
 
 .success {
@@ -170,6 +182,10 @@
 .btnSecondary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btnSecondary:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .voucherCode {
@@ -266,6 +282,9 @@
   .page {
     padding: 1rem;
     background-attachment: scroll;
+    /* iOS safe area */
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
   .card {
@@ -281,7 +300,7 @@
 
   .input {
     padding: 0.875rem;
-    font-size: 0.95rem;
+    font-size: max(0.95rem, 16px);
     margin-bottom: 0.875rem;
   }
 

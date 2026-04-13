@@ -51,11 +51,15 @@ export default function Modal({
           bottom: 0;
           background: rgba(0, 0, 0, 0.7);
           backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 10000;
           animation: fadeIn 0.2s ease-out;
+          /* iOS fixes */
+          -webkit-overflow-scrolling: touch;
+          overflow-y: auto;
         }
 
         @keyframes fadeIn {
@@ -138,6 +142,12 @@ export default function Modal({
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
+          /* Better touch targets */
+          min-height: 44px;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          -webkit-user-select: none;
+          user-select: none;
         }
 
         .btn-cancel {
@@ -160,8 +170,12 @@ export default function Modal({
 
         .btn-confirm.danger:hover {
           background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Active state for mobile */
+        .btn-confirm.danger:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
         }
 
         .btn-confirm.warning {
@@ -170,8 +184,11 @@ export default function Modal({
 
         .btn-confirm.warning:hover {
           background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-confirm.warning:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
         }
 
         .btn-confirm.info {
@@ -180,14 +197,19 @@ export default function Modal({
 
         .btn-confirm.info:hover {
           background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-confirm.info:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
         }
 
         @media (max-width: 768px) {
           .modal-content {
             width: 95%;
             margin: 1rem;
+            max-height: 90vh;
+            overflow-y: auto;
           }
 
           .modal-footer {
@@ -197,6 +219,14 @@ export default function Modal({
           .btn-cancel,
           .btn-confirm {
             width: 100%;
+            padding: 1rem;
+          }
+        }
+
+        /* iOS Safari specific */
+        @supports (-webkit-touch-callout: none) {
+          .modal-content {
+            margin-bottom: env(safe-area-inset-bottom);
           }
         }
       `}</style>
