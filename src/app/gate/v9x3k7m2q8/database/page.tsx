@@ -181,7 +181,16 @@ export default function DatabaseViewer() {
       <div className={styles.content}>
         {activeTab === 'vouchers' && (
           <div className={styles.tableCard}>
-            <h2>Vouchers Table ({filteredVouchers.length})</h2>
+            <div className={styles.tableHeader}>
+              <h2>Vouchers Table ({filteredVouchers.length})</h2>
+              <input
+                type="text"
+                placeholder="🔍 Search..."
+                value={voucherSearch}
+                onChange={(e) => { setVoucherSearch(e.target.value); setVoucherPage(1); }}
+                className={styles.searchInput}
+              />
+            </div>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -190,35 +199,25 @@ export default function DatabaseViewer() {
                     <th>Customer Name</th>
                     <th>Customer Email</th>
                     <th>Status</th>
-                    <th>Branch ID</th>
+                    <th>Branch</th>
                     <th>Created At</th>
                     <th>Used At</th>
                     <th>Expires At</th>
                     <th>Actions</th>
-                    <th className={styles.searchHeader}>
-                      <input
-                        type="text"
-                        placeholder="🔍 Search..."
-                        value={voucherSearch}
-                        onChange={(e) => { setVoucherSearch(e.target.value); setVoucherPage(1); }}
-                        className={styles.searchInput}
-                      />
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedVouchers.length > 0 ? (
                     paginatedVouchers.map((v: any) => (
                       <tr key={v.id}>
-                        <td><code>{v.id}</code></td>
                         <td><code className={styles.code}>{v.code}</code></td>
                         <td>{v.customer.fullName}</td>
-                        <td><code>{v.customer.email}</code></td>
+                        <td>{v.customer.email}</td>
                         <td><span className={`${styles.badge} ${styles[v.status.toLowerCase()]}`}>{v.status}</span></td>
                         <td>{v.branch?.name || '-'}</td>
-                        <td>{new Date(v.createdAt).toLocaleString()}</td>
-                        <td>{v.usedAt ? new Date(v.usedAt).toLocaleString() : '-'}</td>
-                        <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleString() : '-'}</td>
+                        <td>{new Date(v.createdAt).toLocaleDateString()}</td>
+                        <td>{v.usedAt ? new Date(v.usedAt).toLocaleDateString() : '-'}</td>
+                        <td>{v.expiresAt ? new Date(v.expiresAt).toLocaleDateString() : '-'}</td>
                         <td>
                           <button 
                             onClick={() => handleDelete(v.id, v.code)}
@@ -228,13 +227,12 @@ export default function DatabaseViewer() {
                             🗑️
                           </button>
                         </td>
-                        <td></td>
                       </tr>
                     ))
                   ) : (
                     Array.from({ length: itemsPerPage }).map((_, i) => (
                       <tr key={`empty-${i}`} className={styles.emptyRow}>
-                        <td colSpan={11} className={styles.emptyCell}>
+                        <td colSpan={9} className={styles.emptyCell}>
                           {i === 0 && 'No vouchers found'}
                         </td>
                       </tr>
@@ -269,14 +267,16 @@ export default function DatabaseViewer() {
 
         {activeTab === 'customers' && (
           <div className={styles.tableCard}>
-            <h2>Customers Table ({filteredCustomers.length})</h2>
-            <input
-                        type="text"
-                        placeholder="🔍 Search..."
-                        value={customerSearch}
-                        onChange={(e) => { setCustomerSearch(e.target.value); setCustomerPage(1); }}
-                        className={styles.searchInput}
-                      />
+            <div className={styles.tableHeader}>
+              <h2>Customers Table ({filteredCustomers.length})</h2>
+              <input
+                type="text"
+                placeholder="🔍 Search..."
+                value={customerSearch}
+                onChange={(e) => { setCustomerSearch(e.target.value); setCustomerPage(1); }}
+                className={styles.searchInput}
+              />
+            </div>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -286,26 +286,23 @@ export default function DatabaseViewer() {
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Created At</th>
-                    <th className={styles.searchHeader}></th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedCustomers.length > 0 ? (
                     paginatedCustomers.map((v: any) => (
                       <tr key={v.customer.email}>
-                        <td><code>{v.id.substring(0, 12)}...</code></td>
+                        <td><code className={styles.code}>{v.code}</code></td>
                         <td>{v.customer.fullName}</td>
                         <td>{v.customer.email}</td>
                         <td>{v.customer.phone}</td>
-                        <td>{new Date(v.createdAt).toLocaleString()}</td>
-                        <td><code className={styles.code}>{v.code}</code></td>
-                        <td></td>
+                        <td>{new Date(v.createdAt).toLocaleDateString()}</td>
                       </tr>
                     ))
                   ) : (
                     Array.from({ length: itemsPerPage }).map((_, i) => (
                       <tr key={`empty-${i}`} className={styles.emptyRow}>
-                        <td colSpan={7} className={styles.emptyCell}>
+                        <td colSpan={5} className={styles.emptyCell}>
                           {i === 0 && 'No customers found'}
                         </td>
                       </tr>
@@ -340,7 +337,16 @@ export default function DatabaseViewer() {
 
         {activeTab === 'branches' && (
           <div className={styles.tableCard}>
-            <h2>Branches Table ({filteredBranches.length})</h2>
+            <div className={styles.tableHeader}>
+              <h2>Branches Table ({filteredBranches.length})</h2>
+              <input
+                type="text"
+                placeholder="🔍 Search..."
+                value={branchSearch}
+                onChange={(e) => { setBranchSearch(e.target.value); setBranchPage(1); }}
+                className={styles.searchInput}
+              />
+            </div>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -349,15 +355,6 @@ export default function DatabaseViewer() {
                     <th>Name</th>
                     <th>Location</th>
                     <th>Redemptions</th>
-                    <th className={styles.searchHeader}>
-                      <input
-                        type="text"
-                        placeholder="🔍 Search..."
-                        value={branchSearch}
-                        onChange={(e) => { setBranchSearch(e.target.value); setBranchPage(1); }}
-                        className={styles.searchInput}
-                      />
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -370,14 +367,13 @@ export default function DatabaseViewer() {
                           <td>{b.name}</td>
                           <td>{b.location || '-'}</td>
                           <td><span className={styles.countBadge}>{redemptions}</span></td>
-                          <td></td>
                         </tr>
                       );
                     })
                   ) : (
                     Array.from({ length: itemsPerPage }).map((_, i) => (
                       <tr key={`empty-${i}`} className={styles.emptyRow}>
-                        <td colSpan={5} className={styles.emptyCell}>
+                        <td colSpan={4} className={styles.emptyCell}>
                           {i === 0 && 'No branches found'}
                         </td>
                       </tr>

@@ -109,10 +109,22 @@
   font-size: 1.3rem;
 }
 
-.searchHeader {
-  text-align: right !important;
-  vertical-align: middle !important;
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
+
+.tableHeader h2 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 1.3rem;
+}
+
+
 
 .searchInput {
   padding: 0.5rem 0.75rem;
@@ -389,6 +401,16 @@
   .tableCard h2 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
+  }
+
+  .tableHeader {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 1rem;
+  }
+
+  .tableHeader h2 {
+    font-size: 1.1rem;
   }
 
   .tableWrapper {
