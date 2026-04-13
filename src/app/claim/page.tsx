@@ -22,7 +22,7 @@ export default function ClaimPage() {
     e.preventDefault();
 
     if (!validatePhone(formData.phone)) {
-      showToast('Please enter a valid Philippine phone number (09XXXXXXXXX)', 'error');
+      showToast('⚠️ Please enter a valid Philippine phone number (09XXXXXXXXX)', 'error');
       return;
     }
 
@@ -38,20 +38,20 @@ export default function ClaimPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        showToast(data.error || 'Failed to claim voucher', 'error');
+        showToast(data.error || '❌ Failed to claim voucher. Please try again.', 'error');
         setLoading(false);
         return;
       }
 
       if (data.warning) {
-        showToast(data.warning, 'info');
+        showToast('⚠️ ' + data.warning, 'info');
       } else {
         setSubmitted(true);
-        showToast('Voucher sent to your email!', 'success');
+        showToast('✅ Voucher sent to your email!', 'success');
       }
     } catch (error) {
       console.error('Claim error:', error);
-      showToast('Server error. Please try again.', 'error');
+      showToast('💥 Server error. Please try again later.', 'error');
     } finally {
       setLoading(false);
     }
