@@ -17,6 +17,7 @@ prod.db
 .env.local
 .env.production.local
 .env.development.local
+.env.example
 
 # Logs
 *.log
@@ -44,4 +45,24 @@ src/generated/
 .turbo
 .vercel
 
-.vercel
+# Sensitive/internal docs
+AGENTS.md
+BREVO_SETUP.md
+BREVO_TROUBLESHOOTING.md
+CLAUDE.md
+CUSTOMIZATION_GUIDE.md
+DASHBOARD-CUSTOMIZATION-GUIDE.md
+DEPLOYMENT-COMPLETE.md
+DEPLOYMENT-SUCCESS.md
+DEPLOYMENT.md
+FIX-PAGE-ERROR.md
+RATE_LIMITING.md
+SECURITY_ROTATION_GUIDE.md
+SECURITY-PERFORMANCE.md
+SETUP.md
+SMS-SETUP-GUIDE.md
+TOAST_CUSTOMIZATION.md
+VERCEL-TURSO-DEPLOY.md
+WALLED_GARDEN_GUIDE.md
+voucher implementation tasks
+voucher system implementation plan
